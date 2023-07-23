@@ -4,38 +4,19 @@
 {% block content %}
 {% include "header.html" %}
 
-  <!-- Page Header -->
-  <header class="masthead" style="background-image: url('https://wallpaperaccess.com/full/3214373.jpg')">
+
+<header class="masthead" style="background-image: url('https://media.istockphoto.com/id/1293850746/photo/to-do-list.jpg?s=170667a&w=0&k=20&c=XGjC_0WhycT_RtLOzyUFyCZ9MkOJdiylJkp19upc1G4=')">
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="page-heading">
-            <h1>Log In</h1>
-            <span class="subheading">Welcome Back!</span>
+            <h1>Create your to-do list</h1>
           </div>
         </div>
       </div>
     </div>
   </header>
-
-  <div class="container">
-    <div class="row">
-
-      <div class="col-lg-8 col-md-10 mx-auto content">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class=flashes>
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                </ul>
-          {% endif %}
-        {% endwith %}
-        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-      </div>
-    </div>
-  </div>
 
 
 {% endblock %}

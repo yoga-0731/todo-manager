@@ -1,6 +1,6 @@
-from flask import Flask, render_template, flash, redirect, url_for
+from flask import Flask, render_template, flash, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, login_user, logout_user, LoginManager
+from flask_login import UserMixin, login_user, logout_user, LoginManager, current_user, login_required
 from sqlalchemy.orm import relationship
 from forms import RegisterForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -40,9 +40,24 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/todos')
+# TODO: Infinite loop fix
+@app.route('/todos', methods=["GET", "POST"])
+@login_required
 def todos():
-    return render_template('todo.html')
+    print(request.form.get('todoitem'))
+    new_todo = TodoList(list=request.form.get('todoitem'), user_id=current_user.id)
+    db.session.add(new_todo)
+    db.session.commit()
+    return redirect(url_for("todos"))
+
+    return render_template('todo.html', todos=get_all_todos)
+
+
+def get_all_todos():
+    print(current_user)
+    print(current_user.id)
+    print(db.session.query(TodoList).filter_by(user_id=current_user.id))
+    return db.session.query(TodoList).filter_by(user_id=current_user.id)
 
 
 @app.route('/register', methods=["GET", "POST"])

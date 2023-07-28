@@ -29,6 +29,7 @@ class TodoList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     list = db.Column(db.String(250))
+    complete = db.Column(db.Boolean, default=False)
 
 
 with app.app_context():

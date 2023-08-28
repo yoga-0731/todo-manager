@@ -4,17 +4,55 @@
 {% include "header.html" %}
 
 <!-- Page Header -->
-  <header class="masthead" style="background-image: url('https://imageio.forbes.com/specials-images/dam/imageserve/1092571024/0x0.jpg?format=jpg&width=1200')">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="page-heading">
-            <h1>Welcome to Todo list manager!</h1>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+<header>
+  <title>Todo Manager</title>
+  <style>
+    html {
+      padding: 20px;
+    }
+  </style>
+</header>
+
+<body>
+  <h2>Hello {{ name }}, Welcome to Todo list manager!</h2>
+
+  {% if todos %}
+    <h3>Your To-do list:</h3>
+    {% for todo in todos: %}
+      <ul>
+        <form action="{{ url_for('completed') }}" method="post">
+          <label name="myCheck">{{ todo.list }}</label>
+          <input type="checkbox" name="" onclick="setValue()">
+        </form>
+      </ul>
+    {% endfor %}
+  {% endif %}
+
+  <form action="{{ url_for('add_todo') }}" method="post">
+    <input type="text" style="width: 200px" placeholder="Enter anything you want to do" name="todo-item">
+    <button type="submit">Add Item</button>
+  </form>
+
+  {%if completed_items: %}
+    <h3>Completed Items:</h3>
+    {% for item in completed_items: %}
+      <ul>
+        <p>{{ item }}</p>
+      </ul>
+    {% endfor %}
+  {% endif %}
+</body>
+
+<script>
+function setValue() {
+  var checkBox = document.getElementById("myCheck");
+  if (checkBox.checked == true){
+     checkBox.name = "True";
+  } else {
+     checkBox.name = "False";
+  }
+}
+</script>
 
 {% endblock %}
+

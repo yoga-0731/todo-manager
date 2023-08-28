@@ -38,27 +38,33 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', name=current_user.name, todos=get_all_todos(), completed_items=get_completed_items())
 
 
-# TODO: Infinite loop fix
-@app.route('/todos', methods=["GET", "POST"])
-@login_required
-def todos():
-    print(request.form.get('todoitem'))
-    new_todo = TodoList(list=request.form.get('todoitem'), user_id=current_user.id)
+@app.route('/', methods=["GET", "POST"])
+def add_todo():
+    new_todo = TodoList(list=request.form.get('todo-item'), user_id=current_user.id)
     db.session.add(new_todo)
     db.session.commit()
-    return redirect(url_for("todos"))
-
-    return render_template('todo.html', todos=get_all_todos)
+    return redirect(url_for('home'))
 
 
 def get_all_todos():
-    print(current_user)
-    print(current_user.id)
-    print(db.session.query(TodoList).filter_by(user_id=current_user.id))
-    return db.session.query(TodoList).filter_by(user_id=current_user.id)
+    return db.session.query(TodoList).filter_by(user_id=current_user.id, complete=False)
+
+
+@app.route('/completed', methods=["GET", "POST"])
+def completed():
+    print(request.form.get('True'))
+    # if request.form.get("True"):
+        # item = db.session.query(TodoList).filter_by(item_id=item_id)
+        # item.complete = True
+        # db.session.commit()
+    return redirect(url_for('home'))
+
+
+def get_completed_items():
+    return db.session.query(TodoList).filter_by(user_id=current_user.id, complete=True)
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -103,7 +109,7 @@ def login():
             user = db.session.query(User).filter_by(email=email).first()
             if check_password_hash(user.password, password):
                 login_user(user)
-                return redirect(url_for('todos'))
+                return redirect(url_for('home'))
             else:
                 flash("The password is incorrect!")
         else:

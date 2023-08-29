@@ -11,6 +11,7 @@
       padding: 20px;
     }
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </header>
 
 <body>
@@ -20,10 +21,7 @@
     <h3>Your To-do list:</h3>
     {% for todo in todos: %}
       <ul>
-        <form action="{{ url_for('completed') }}" method="post">
-          <label name="myCheck">{{ todo.list }}</label>
-          <input type="checkbox" name="" onclick="setValue()">
-        </form>
+        <label><input class="todo-list" data-param="{{ todo.id }}" type="checkbox">{{ todo.list }}</label>
       </ul>
     {% endfor %}
   {% endif %}
@@ -41,18 +39,30 @@
       </ul>
     {% endfor %}
   {% endif %}
+
 </body>
 
 <script>
-function setValue() {
-  var checkBox = document.getElementById("myCheck");
-  if (checkBox.checked == true){
-     checkBox.name = "True";
-  } else {
-     checkBox.name = "False";
-  }
-}
+$(document).ready(function() {
+    $("#todo-list").change(function() {
+        if (this.checked) {
+            var itemid = $(this).data("param");
+                $.ajax({
+                    type: "POST",
+                    url: "/completed",
+                    data: {
+                        item_id: itemid
+                    },
+                    success: function (response) {
+                        console.log(response);
+                    }
+                });
+        }
+    });
+});
 </script>
 
+
 {% endblock %}
+
 

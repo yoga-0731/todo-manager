@@ -53,18 +53,19 @@ def get_all_todos():
     return db.session.query(TodoList).filter_by(user_id=current_user.id, complete=False)
 
 
-@app.route('/completed', methods=["GET", "POST"])
-def completed():
-    print(request.form.get('True'))
-    # if request.form.get("True"):
-        # item = db.session.query(TodoList).filter_by(item_id=item_id)
-        # item.complete = True
-        # db.session.commit()
-    return redirect(url_for('home'))
-
-
 def get_completed_items():
     return db.session.query(TodoList).filter_by(user_id=current_user.id, complete=True)
+
+
+@app.route('/completed', methods=["POST"])
+def completed():
+    item_id = request.args.get('item_id')
+    print(item_id)
+    item = db.session.query(TodoList).filter_by(id=item_id)
+    print(item)
+    item.complete = True
+    db.session.commit()
+    return redirect(url_for('home'))
 
 
 @app.route('/register', methods=["GET", "POST"])

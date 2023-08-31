@@ -11,7 +11,6 @@
       padding: 20px;
     }
   </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </header>
 
 <body>
@@ -21,7 +20,7 @@
     <h3>Your To-do list:</h3>
     {% for todo in todos: %}
       <ul>
-        <label><input class="todo-list" data-param="{{ todo.id }}" type="checkbox">{{ todo.list }}</label>
+        <label data-param="{{ todo.id }}"><input class="todo-list" type="checkbox">{{ todo.list }}</label>
       </ul>
     {% endfor %}
   {% endif %}
@@ -35,24 +34,27 @@
     <h3>Completed Items:</h3>
     {% for item in completed_items: %}
       <ul>
-        <p>{{ item }}</p>
+        <li>{{ item.list }}</li>
       </ul>
     {% endfor %}
   {% endif %}
 
 </body>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $("#todo-list").change(function() {
+    $(".todo-list").change(function() {
         if (this.checked) {
-            var itemid = $(this).data("param");
+            var itemid = $(this).closest("label").data("param");
+            console.log(itemid);
                 $.ajax({
                     type: "POST",
                     url: "/completed",
-                    data: {
-                        item_id: itemid
-                    },
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        'item_id': itemid
+                    }),
                     success: function (response) {
                         console.log(response);
                     }

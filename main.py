@@ -5,9 +5,11 @@ from sqlalchemy.orm import relationship
 from forms import RegisterForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap
-
+from flask_cors import CORS
+from traceback import format_exc
 
 app = Flask(__name__)
+CORS(app, resources={r"/completed": {"origins": "http://127.0.0.1:5000"}})
 
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo-manager.db'
@@ -57,15 +59,23 @@ def get_completed_items():
     return db.session.query(TodoList).filter_by(user_id=current_user.id, complete=True)
 
 
-@app.route('/completed', methods=["POST"])
+@app.route('/completed', methods=["GET", "POST"])
 def completed():
-    item_id = request.args.get('item_id')
-    print(item_id)
-    item = db.session.query(TodoList).filter_by(id=item_id)
-    print(item)
-    item.complete = True
-    db.session.commit()
-    return redirect(url_for('home'))
+    try:
+        item_id = request.json.get('item_id')
+        print(item_id)
+        item = db.session.query(TodoList).filter_by(id=item_id).first()
+
+        if item:
+            item.complete = True
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            return "Item not found", 404
+    except Exception as e:
+        print("Error:", e)
+        print(format_exc())
+        return "An error occurred", 500
 
 
 @app.route('/register', methods=["GET", "POST"])

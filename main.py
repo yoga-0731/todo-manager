@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, login_user, logout_user, LoginManager, current_user
+from flask_login import UserMixin, login_user, logout_user, LoginManager, current_user, login_manager
 from forms import RegisterForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap
@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 Bootstrap(app)
 
 
-class User(UserMixin, db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
@@ -39,7 +39,10 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return render_template('index.html', name=current_user.name, todos=get_all_todos(), completed_items=get_completed_items())
+    if current_user.is_authenticated:
+        return render_template('index.html', name=current_user.name, todos=get_all_todos(), completed_items=get_completed_items())
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -62,7 +65,7 @@ def get_completed_items():
 def completed():
     try:
         item_id = request.json.get('item_id')
-        print(item_id)
+        # print(item_id)
         item = db.session.query(TodoList).filter_by(id=item_id).first()
 
         if item:
@@ -123,7 +126,7 @@ def login():
             else:
                 flash("The password is incorrect!")
         else:
-            flash("This email ID doesn't exist. Please try again!")
+            flash("This email ID doesn't exist. Please signup!")
     return render_template("login.html", form=form)
 
 
@@ -135,3 +138,5 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
